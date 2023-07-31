@@ -62,7 +62,7 @@ class SubLinkTransfer:
 
             if components["network"] == "ws":
                 components["ws-opts"] = dict(path=tmp_dict["path"])
-                if "sni" in tmp_dict:
+                if "sni" in tmp_dict and tmp_dict["sni"] != "":
                     components["ws-opts"]["headers"] = dict(Host=tmp_dict["sni"])
 
             return components

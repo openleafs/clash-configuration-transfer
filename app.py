@@ -15,10 +15,9 @@ def transfer():
     self_clash_configuration = sub_link_transfer.get_result()
 
     yaml_data = yaml.dump(self_clash_configuration)
-    response = Response(yaml_data, content_type="text/yaml")
-    response.headers["Content-Disposition"] = "attachment; filename=data.yaml"
+    response = Response(yaml_data, content_type="text/plain;charset=utf-8")
 
-    return self_clash_configuration
+    return response
 
 
 if __name__ == '__main__':
