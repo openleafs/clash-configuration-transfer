@@ -5,11 +5,15 @@ import requests
 import yaml
 
 
+def decode_base64_str(base64_str: str):
+    return base64.b64decode(base64_str.encode("utf-8") + b"==").decode("utf-8")
+
+
 class SubLinkTransfer:
 
     def __init__(self, sub_link: str, custom_link: str):
-        self.sub_link = base64.b64decode(sub_link.encode("utf-8") + b"==").decode("utf-8")
-        self.custom_link = base64.b64decode(custom_link.encode("utf-8") + b"==").decode("utf-8").split("|")
+        self.sub_link = decode_base64_str(sub_link)
+        self.custom_link = None if custom_link is None else decode_base64_str(custom_link).split("|")
 
     @staticmethod
     def decode_base64_for_proxy_link(proxy_link: str):
@@ -21,8 +25,7 @@ class SubLinkTransfer:
             proxy_configuration_base64 = proxy_content
             domain = ""
 
-        proxy_configuration_byte = proxy_configuration_base64.encode("utf-8")
-        proxy_configuration = base64.b64decode(proxy_configuration_byte + b"==").decode("utf-8")
+        proxy_configuration = decode_base64_str(proxy_configuration_base64)
 
         return proxy_protocol, proxy_configuration, domain
 
