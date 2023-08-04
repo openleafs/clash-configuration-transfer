@@ -8,8 +8,8 @@ import yaml
 class SubLinkTransfer:
 
     def __init__(self, sub_link: str, custom_link: str):
-        self.sub_link = sub_link
-        self.custom_link = custom_link.split("|")
+        self.sub_link = base64.b64decode(sub_link.encode("utf-8") + b"==").decode("utf-8")
+        self.custom_link = base64.b64decode(custom_link.encode("utf-8") + b"==").decode("utf-8").split("|")
 
     @staticmethod
     def decode_base64_for_proxy_link(proxy_link: str):
@@ -110,9 +110,7 @@ class SubLinkTransfer:
     def get_result(self, file_name: str = "self_clash.yaml"):
 
         try:
-            sub_link = base64.b64decode(self.sub_link.encode("utf-8") + b"==").decode("utf-8")
-
-            r = requests.get(sub_link)
+            r = requests.get(self.sub_link)
             proxy_link_str = base64.b64decode(r.text.encode("utf-8") + b"==").decode("utf-8")
 
             proxy_links = proxy_link_str.split("\n")
