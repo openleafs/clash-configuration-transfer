@@ -4,11 +4,11 @@ import configparser
 import yaml
 from flask import Flask, request, Response
 
-from sub_link_transfer import SubLinkTransfer
+from src.sub_link_transfer import SubLinkTransfer
 
 app = Flask(__name__)
 
-logging.basicConfig(filename="clash_configuration_transfer.log", level=logging.DEBUG,
+logging.basicConfig(filename="log/clash_configuration_transfer.log", level=logging.DEBUG,
                     format=f"%(asctime)s %(levelname)s %(name)s %(threadName)s : %(message)s")
 
 
@@ -24,9 +24,12 @@ def transfer():
 
         pass_link = request.args.get("pass_link")
 
+        if pass_link is None:
+            raise ValueError("You must offer a pass_link")
+
         if int(pass_link) == 0:
             config = configparser.ConfigParser()
-            config.read("config.ini")
+            config.read("src/config.ini")
             sub_link = config["proxy_link"]["sub_link"]
             custom_link = config["proxy_link"]["custom_link"]
         else:

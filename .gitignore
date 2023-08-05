@@ -1,7 +1,7 @@
 # custom
-config.ini
+src/config.ini
 *.yaml
-!template-example.yaml
+!template/template-example.yaml
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
