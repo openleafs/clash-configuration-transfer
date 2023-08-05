@@ -12,4 +12,4 @@ sudo docker build -t clash/config-transfer .
 echo "build a new image: clash/config-transfer"
 
 sudo docker run -d -p 5000:5000 --name clash clash/config-transfer
-echo "run a new contianer: clash"
+echo "run a new container: clash"

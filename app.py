@@ -1,3 +1,4 @@
+import os
 import logging
 import configparser
 
@@ -8,7 +9,7 @@ from src.sub_link_transfer import SubLinkTransfer
 
 app = Flask(__name__)
 
-logging.basicConfig(filename="log/clash_configuration_transfer.log", level=logging.DEBUG,
+logging.basicConfig(filename=os.getcwd() + "/log/clash_configuration_transfer.log", level=logging.DEBUG,
                     format=f"%(asctime)s %(levelname)s %(name)s %(threadName)s : %(message)s")
 
 
@@ -16,10 +17,10 @@ logging.basicConfig(filename="log/clash_configuration_transfer.log", level=loggi
 def transfer():
     try:
         log_data = {
-            "request_method": request.method,
-            "request_path": request.path,
-            "request_args": request.args,
-            "request_data": request.data.decode("utf-8")
+            "method": request.method,
+            "path": request.path,
+            "args": request.args,
+            "data": request.data.decode("utf-8")
         }
 
         pass_link = request.args.get("pass_link")

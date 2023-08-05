@@ -9,6 +9,8 @@ WORKDIR /app
 # Copy the Python application files into the container
 COPY . .
 
+RUN mkdir log
+
 # Install application dependencies
 RUN pip install --no-cache-dir -r requirements.txt
 
