@@ -1,3 +1,5 @@
+import logging
+
 import yaml
 from flask import Flask, request, Response
 
@@ -5,16 +7,28 @@ from sub_link_transfer import SubLinkTransfer
 
 app = Flask(__name__)
 
+logging.basicConfig(filename="clash_configuration_transfer.log", level=logging.DEBUG,
+                    format=f"%(asctime)s %(levelname)s %(name)s %(threadName)s : %(message)s")
 
-# Route decorator to handle GET requests at the root URL "/"
+
 @app.route("/transfer", methods=["GET"])
 def transfer():
     try:
         sub_link = request.args.get("sub_link")
         custom_link = request.args.get("custom_link")
 
-        if sub_link is None or custom_link is None:
-            return "please offer both sub link and custom link"
+        log_data = {
+            "request_method": request.method,
+            "request_path": request.path,
+            "request_args": request.args,
+            "request_data": request.data.decode("utf-8")
+        }
+
+        app.logger.info(log_data)
+
+        if sub_link is None:
+            app.logger.warning("sub_link does not provided")
+            return "You must offer sub link"
 
         sub_link_transfer = SubLinkTransfer(sub_link, custom_link)
         self_clash_configuration = sub_link_transfer.get_result()
@@ -27,5 +41,5 @@ def transfer():
         return str(e)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     app.run(host="0.0.0.0")
