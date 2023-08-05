@@ -1,6 +1,5 @@
 # custom
-*/resource/
-*/config.ini
+config.ini
 *.yaml
 !template-example.yaml
 

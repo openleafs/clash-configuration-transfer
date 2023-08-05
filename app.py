@@ -1,4 +1,5 @@
 import logging
+import configparser
 
 import yaml
 from flask import Flask, request, Response
@@ -14,9 +15,6 @@ logging.basicConfig(filename="clash_configuration_transfer.log", level=logging.D
 @app.route("/transfer", methods=["GET"])
 def transfer():
     try:
-        sub_link = request.args.get("sub_link")
-        custom_link = request.args.get("custom_link")
-
         log_data = {
             "request_method": request.method,
             "request_path": request.path,
@@ -24,11 +22,21 @@ def transfer():
             "request_data": request.data.decode("utf-8")
         }
 
-        app.logger.info(log_data)
+        pass_link = request.args.get("pass_link")
 
-        if sub_link is None:
-            app.logger.warning("sub_link does not provided")
-            return "You must offer sub link"
+        if int(pass_link) == 0:
+            config = configparser.ConfigParser()
+            config.read("config.ini")
+            sub_link = config["proxy_link"]["sub_link"]
+            custom_link = config["proxy_link"]["custom_link"]
+        else:
+            sub_link = request.args.get("sub_link")
+            custom_link = request.args.get("custom_link")
+
+            if sub_link is None:
+                raise ValueError("You must offer at least a sub link")
+
+        app.logger.info(log_data)
 
         sub_link_transfer = SubLinkTransfer(sub_link, custom_link)
         self_clash_configuration = sub_link_transfer.get_result()
@@ -38,6 +46,7 @@ def transfer():
 
         return response
     except Exception as e:
+        app.logger.error(e)
         return str(e)
 
 
