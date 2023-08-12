@@ -2,6 +2,7 @@
 src/config.ini
 *.yaml
 !template/template-example.yaml
+allowed_ips.conf
 
 # Byte-compiled / optimized / DLL files
 __pycache__/

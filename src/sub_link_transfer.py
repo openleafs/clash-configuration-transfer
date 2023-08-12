@@ -1,18 +1,15 @@
-import base64
 import os
 import traceback
 
 import requests
 import yaml
 
-
-def decode_base64_str(base64_str: str):
-    return base64.b64decode(base64_str.encode("utf-8") + b"==").decode("utf-8")
+from src.utils import decode_base64_str
 
 
 class SubLinkTransfer:
 
-    def __init__(self, sub_link: str, custom_link: str):
+    def __init__(self, sub_link: str, custom_link: str = None):
         self.sub_link = decode_base64_str(sub_link)
         self.custom_link = None if custom_link is None else decode_base64_str(custom_link).split("|")
 
@@ -111,11 +108,10 @@ class SubLinkTransfer:
 
         return clash_configuration
 
-    def get_result(self):
-
+    def get_proxies_result(self):
         try:
             r = requests.get(self.sub_link)
-            proxy_link_str = base64.b64decode(r.text.encode("utf-8") + b"==").decode("utf-8")
+            proxy_link_str = decode_base64_str(r.text)
 
             proxy_links = proxy_link_str.split("\n")
 
@@ -123,6 +119,17 @@ class SubLinkTransfer:
                 proxy_links.extend(self.custom_link)
 
             proxies = self.get_proxies_components(proxy_links)
+
+            return proxies
+
+        except Exception as e:
+            traceback.print_exc()
+            return str(e)
+
+    def get_result(self):
+
+        try:
+            proxies = self.get_proxies_result()
 
             with open(os.getcwd() + "/template/template.yaml", "rt", encoding="utf-8") as file:
                 clash_configuration_template = yaml.safe_load(file)

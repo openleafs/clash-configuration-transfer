@@ -23,12 +23,12 @@ def transfer():
             "data": request.data.decode("utf-8")
         }
 
-        pass_link = request.args.get("pass_link")
+        is_pass_link = request.args.get("is_pass_link")
 
-        if pass_link is None:
-            raise ValueError("You must offer a pass_link")
+        if is_pass_link is None:
+            raise ValueError("You must offer a parameter")
 
-        if int(pass_link) == 0:
+        if int(is_pass_link) == 1:
             config = configparser.ConfigParser()
             config.read("src/config.ini")
             sub_link = config["proxy_link"]["sub_link"]
@@ -49,6 +49,44 @@ def transfer():
         response = Response(yaml_data, content_type="text/plain; charset=utf-8")
 
         return response
+    except Exception as e:
+        app.logger.error(e)
+        return str(e)
+
+
+@app.route("/allow", methods=["GET"])
+def allow_list():
+    try:
+        log_data = {
+            "method": request.method,
+            "path": request.path,
+            "args": request.args,
+            "data": request.data.decode("utf-8")
+        }
+
+        config = configparser.ConfigParser()
+        config.read("src/config.ini")
+        sub_link = config["proxy_link"]["sub_link"]
+
+        app.logger.info(log_data)
+
+        sub_link_transfer = SubLinkTransfer(sub_link)
+        proxies = sub_link_transfer.get_proxies_result()
+
+        allow_directives = []
+
+        for item in proxies:
+            if "server" in item:
+                ip_address = item["server"]
+                allow_directive = f"allow {ip_address};"
+                allow_directives.append(allow_directive)
+
+        # Write the directives to a file
+        with open("template/allowed_ips.conf", "w") as file:
+            for directive in allow_directives:
+                file.write(directive + "\n")
+            return "update allow list successfully"
+
     except Exception as e:
         app.logger.error(e)
         return str(e)
