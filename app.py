@@ -45,7 +45,7 @@ def transfer():
         sub_link_transfer = SubLinkTransfer(sub_link, custom_link)
         self_clash_configuration = sub_link_transfer.get_result()
 
-        yaml_data = yaml.dump(self_clash_configuration)
+        yaml_data = yaml.dump(self_clash_configuration, allow_unicode=True)
         response = Response(yaml_data, content_type="text/plain; charset=utf-8")
 
         return response
