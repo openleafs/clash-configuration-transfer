@@ -1,4 +1,5 @@
 import os
+import re
 import logging
 import configparser
 
@@ -85,7 +86,9 @@ def allow_list():
         with open("template/allowed_ips.conf", "w") as file:
             for directive in allow_directives:
                 file.write(directive + "\n")
-            return f"Update allow list successfully. IP list: {allow_directives}"
+
+            hide_allow_directives = [re.sub(r"\d+.", "*.", i, 2) for i in allow_directives]
+            return f"Update allow list successfully. IP list: {hide_allow_directives}"
 
     except Exception as e:
         app.logger.error(e)
