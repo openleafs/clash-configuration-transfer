@@ -83,7 +83,7 @@ def allow_list():
                 allow_directives.append(allow_directive)
 
         # Write the directives to a file
-        with open("template/allowed_ips.conf", "w") as file:
+        with open("resource/allowed_ips.conf", "w") as file:
             for directive in allow_directives:
                 file.write(directive + "\n")
 
