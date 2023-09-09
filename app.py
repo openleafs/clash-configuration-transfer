@@ -44,10 +44,32 @@ def transfer():
         app.logger.info(log_data)
 
         sub_link_transfer = SubLinkTransfer(sub_link, custom_link)
-        self_clash_configuration = sub_link_transfer.get_result()
+        clash_configuration = sub_link_transfer.get_result()
 
-        yaml_data = yaml.dump(self_clash_configuration, allow_unicode=True)
+        yaml_data = yaml.dump(clash_configuration, allow_unicode=True)
         response = Response(yaml_data, content_type="text/plain; charset=utf-8")
+
+        return response
+    except Exception as e:
+        app.logger.error(e)
+        return str(e)
+
+
+@app.route("/rocket", methods=["GET"])
+def shadowrocket():
+    try:
+        log_data = {
+            "method": request.method,
+            "path": request.path,
+            "args": request.args,
+            "data": request.data.decode("utf-8")
+        }
+
+        with open("template/shadowrocket-template.conf", "r") as file:
+
+            app.logger.info(log_data)
+            shaowrocket_configuration = file.read()
+            response = Response(shaowrocket_configuration, content_type="text/plain; charset=utf-8")
 
         return response
     except Exception as e:
