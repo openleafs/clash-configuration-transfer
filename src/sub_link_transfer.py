@@ -131,7 +131,7 @@ class SubLinkTransfer:
         try:
             proxies = self.get_proxies_result()
 
-            with open(os.getcwd() + "/template/template.yaml", "rt", encoding="utf-8") as file:
+            with open(os.getcwd() + "/template/clash-template.yaml", "rt", encoding="utf-8") as file:
                 clash_configuration_template = yaml.safe_load(file)
                 clash_configuration_template["proxies"] = proxies
 

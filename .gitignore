@@ -1,6 +1,6 @@
 # custom
 src/config.ini
-*.yaml
+template/*
 !template/template-example.yaml
 allowed_ips.conf
 
