@@ -11,11 +11,11 @@ echo "rm image clash/config-transfer"
 sudo docker build -t clash/config-transfer .
 echo "build a new image: clash/config-transfer"
 
-sudo docker volume rm allowed_ips
-echo "rm a volume: allowed_ips"
+sudo docker volume rm clash_resource
+echo "rm a volume: clash_resource"
 
-sudo docker volume create allowed_ips
-echo "create a volume: allowed_ips"
+sudo docker volume create clash_resource
+echo "create a volume: clash_resource"
 
-sudo docker run -d -p 5000:5000 --name clash --restart unless-stopped -v allowed_ips:/app/resource clash/config-transfer
+sudo docker run -d -p 5000:5000 --name clash --restart unless-stopped -v clash_resource:/app/resource clash/config-transfer
 echo "run a new container: clash"
