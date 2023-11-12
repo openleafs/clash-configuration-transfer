@@ -14,7 +14,7 @@ class SubLinkTransfer:
         self.custom_link = None if custom_link is None else decode_base64_str(custom_link).split("|")
 
     @staticmethod
-    def decode_base64_for_proxy_link(proxy_link: str):
+    def decode_base64_for_proxy_link(proxy_link: str) -> tuple[str, str, str]:
         proxy_protocol, proxy_content = proxy_link.split("://")
 
         if proxy_protocol == "ss":
@@ -82,7 +82,7 @@ class SubLinkTransfer:
         return proxies
 
     @staticmethod
-    def replace_name_for_proxy_group(clash_configuration: dict):
+    def replace_name_for_proxy_group(clash_configuration: dict) -> dict:
 
         proxies = clash_configuration["proxies"]
         jms_names = [item["name"] for item in proxies if "JMS" in item["name"]]
@@ -108,7 +108,7 @@ class SubLinkTransfer:
 
         return clash_configuration
 
-    def get_proxies_result(self):
+    def get_proxies_result(self) -> list:
         try:
             r = requests.get(self.sub_link)
             proxy_link_str = decode_base64_str(r.text)
@@ -124,9 +124,9 @@ class SubLinkTransfer:
 
         except Exception as e:
             traceback.print_exc()
-            return str(e)
+            return [e]
 
-    def get_result(self):
+    def get_result(self) -> dict:
 
         try:
             proxies = self.get_proxies_result()
@@ -141,4 +141,4 @@ class SubLinkTransfer:
 
         except Exception as e:
             traceback.print_exc()
-            return str(e)
+            return dict(error=e)

@@ -56,7 +56,7 @@ def transfer():
 
 
 @app.route("/rocket", methods=["GET"])
-def shadowrocket():
+def shadow_rocket():
     try:
         log_data = {
             "method": request.method,
@@ -68,8 +68,8 @@ def shadowrocket():
         with open("template/shadowrocket-template.conf", "r") as file:
 
             app.logger.info(log_data)
-            shaowrocket_configuration = file.read()
-            response = Response(shaowrocket_configuration, content_type="text/plain; charset=utf-8")
+            shadow_rocket_configuration = file.read()
+            response = Response(shadow_rocket_configuration, content_type="text/plain; charset=utf-8")
 
         return response
     except Exception as e:
@@ -96,13 +96,7 @@ def allow_list():
         sub_link_transfer = SubLinkTransfer(sub_link)
         proxies = sub_link_transfer.get_proxies_result()
 
-        allow_directives = []
-
-        for item in proxies:
-            if "server" in item:
-                ip_address = item["server"]
-                allow_directive = f"allow {ip_address};"
-                allow_directives.append(allow_directive)
+        allow_directives = [f"""allow {proxy["server"]};""" for proxy in proxies]
 
         # Write the directives to a file
         with open("resource/allowed_ips.conf", "w") as file:
@@ -111,6 +105,40 @@ def allow_list():
 
             hide_allow_directives = [re.sub(r"\d+.", "*.", i, 2) for i in allow_directives]
             return f"Update allow list successfully. IP list: {hide_allow_directives}"
+
+    except Exception as e:
+        app.logger.error(e)
+        return str(e)
+
+
+@app.route("/diff", methods=["GET"])
+def diff_ip():
+    try:
+        log_data = {
+            "method": request.method,
+            "path": request.path,
+            "args": request.args,
+            "data": request.data.decode("utf-8")
+        }
+
+        config = configparser.ConfigParser()
+        config.read("src/config.ini")
+        sub_link = config["proxy_link"]["sub_link"]
+
+        app.logger.info(log_data)
+
+        sub_link_transfer = SubLinkTransfer(sub_link)
+        proxies = sub_link_transfer.get_proxies_result()
+
+        new_ip_address = [proxy["server"] for proxy in proxies]
+
+        with open("resource/allowed_ips.conf", "r") as file:
+            old_ip_address = [re.findall(r"\b(?:\d{1,3}\.){3}\d{1,3}\b", line)[0] for line in file.readlines()]
+
+            if new_ip_address == old_ip_address:
+                return f"ip address does not changed"
+            else:
+                return f"ip address have changed"
 
     except Exception as e:
         app.logger.error(e)
