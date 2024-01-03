@@ -1,8 +1,6 @@
-import os
 import traceback
 
 import requests
-import yaml
 
 from src.utils import decode_base64_str
 
@@ -28,7 +26,7 @@ class SubLinkTransfer:
         return proxy_protocol, proxy_configuration, domain
 
     @staticmethod
-    def get_components_of_configuration(proxy_protocol: str, proxy_configuration: str, domain: str) -> dict:
+    def transfer(proxy_protocol: str, proxy_configuration: str, domain: str) -> dict:
 
         if proxy_protocol == "ss":
             components = proxy_configuration.split("@")
@@ -76,37 +74,10 @@ class SubLinkTransfer:
 
         for proxy_link in proxy_links:
             proxy_protocol, proxy_configuration, domain = self.decode_base64_for_proxy_link(proxy_link)
-            components = self.get_components_of_configuration(proxy_protocol, proxy_configuration, domain)
+            components = self.transfer(proxy_protocol, proxy_configuration, domain)
             proxies.append(components)
 
         return proxies
-
-    @staticmethod
-    def replace_name_for_proxy_group(clash_configuration: dict) -> dict:
-
-        proxies = clash_configuration["proxies"]
-        jms_names = [item["name"] for item in proxies if "JMS" in item["name"]]
-
-        new_proxy_groups = []
-        for proxy_group in clash_configuration["proxy-groups"]:
-            tmp_proxy_group = proxy_group.copy()
-
-            proxies_str_in_proxy_group = ",".join(proxy_group["proxies"])
-
-            if "JMS" in proxies_str_in_proxy_group:
-                no_jms_proxies = filter(lambda x: x if "JMS" not in x else None, proxy_group["proxies"])
-
-                new_jms_proxies = list(no_jms_proxies)
-                new_jms_proxies.extend(jms_names)
-                tmp_proxy_group["proxies"] = new_jms_proxies
-
-                new_proxy_groups.append(tmp_proxy_group)
-            else:
-                new_proxy_groups.append(proxy_group)
-
-        clash_configuration["proxy-groups"] = new_proxy_groups
-
-        return clash_configuration
 
     def get_proxies_result(self) -> list:
         try:
@@ -125,20 +96,3 @@ class SubLinkTransfer:
         except Exception as e:
             traceback.print_exc()
             return [e]
-
-    def get_result(self) -> dict:
-
-        try:
-            proxies = self.get_proxies_result()
-
-            with open(os.getcwd() + "/template/clash-template.yaml", "rt", encoding="utf-8") as file:
-                clash_configuration_template = yaml.safe_load(file)
-                clash_configuration_template["proxies"] = proxies
-
-            self_clash_configuration = self.replace_name_for_proxy_group(clash_configuration_template)
-
-            return self_clash_configuration
-
-        except Exception as e:
-            traceback.print_exc()
-            return dict(error=e)
