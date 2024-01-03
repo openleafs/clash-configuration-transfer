@@ -16,6 +16,8 @@ logging.basicConfig(filename=os.getcwd() + "/log/clash_configuration_transfer.lo
 config = get_config()
 SUB_LINK = config["proxy_link"]["sub_link"]
 CUSTOM_LINK = config["proxy_link"]["custom_link"]
+
+R2_DOMAIN = config["r2"]["R2_DOMAIN"]
 ACCESS_KEY = config["r2"]["access_key"]
 SECRET_KEY = config["r2"]["secret_key"]
 
@@ -50,7 +52,7 @@ def transfer():
         sub_link_transfer = SubLinkTransfer(sub_link, custom_link)
         proxies = sub_link_transfer.get_proxies_result()
 
-        clash_file = get_file_from_r2("clash.yaml", ACCESS_KEY, SECRET_KEY)
+        clash_file = get_file_from_r2("clash.yaml", R2_DOMAIN, ACCESS_KEY, SECRET_KEY)
         clash_configuration_template = yaml.safe_load(clash_file)
         clash_configuration_template["proxies"] = proxies
 
@@ -77,7 +79,7 @@ def shadow_rocket():
 
         app.logger.info(log_data)
 
-        shadow_rocket_configuration = get_file_from_r2("shadowrocket.conf", ACCESS_KEY, SECRET_KEY)
+        shadow_rocket_configuration = get_file_from_r2("shadowrocket.conf", R2_DOMAIN, ACCESS_KEY, SECRET_KEY)
         response = Response(shadow_rocket_configuration, content_type="text/plain; charset=utf-8")
 
         return response

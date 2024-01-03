@@ -1,5 +1,4 @@
 import os
-import yaml
 import base64
 import configparser
 
@@ -20,8 +19,8 @@ def decode_base64_str(base64_str: str) -> str:
     return base64.b64decode(base64_str.encode("utf-8") + b"==").decode("utf-8")
 
 
-def get_file_from_r2(file_name: str, access_key: str, secret_key: str) -> bytes:
-    url = f"https://config-template.leafsyang.com/{file_name}"
+def get_file_from_r2(file_name: str, r2_domain: str, access_key: str, secret_key: str) -> bytes:
+    url = f"https://{r2_domain}/{file_name}"
     headers = {
         "X-ACCESS-KEY": access_key,
         "X-SECRET-KEY": secret_key
