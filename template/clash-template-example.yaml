@@ -1,189 +1,273 @@
 port: 7890
 socks-port: 7891
-allow-lan: true
-mode: rule
+external-controller: 127.0.0.1:9090
 log-level: info
-external-controller: :9090
+mode: rule
 dns:
   enable: true
+  enhanced-mode: fake-ip
+  fake-ip-filter:
+    - +.msftconnecttest.com
+    - +.msftncsi.com
+  fake-ip-range: 198.18.0.1/16
   ipv6: false
   listen: 0.0.0.0:7874
-  enhanced-mode: fake-ip
   nameserver:
     - 192.168.100.1
-  fake-ip-range: 198.18.0.1/16
-  fake-ip-filter:
-    - "+.msftconnecttest.com"
-    - "+.msftncsi.com"
-  fallback:
-    - https://dns.cloudflare.com/dns-query
-    - https://public.dns.iij.jp/dns-query
-    - https://jp.tiar.app/dns-query
-    - https://jp.tiarap.org/dns-query
+    - 192.168.0.1
+    - 192.168.1.1
 proxies:
-  - {name: ss-1, server: 1.1.1.1, port: 443, type: ss, cipher: aes-256-gcm, password: 123456789}
+  - cipher: aes-256-gcm
+    name: test
+    password: 1234
+    port: 1234
+    server: 1.1.1.1
+    type: ss
+    udp: true
 proxy-groups:
   - name: relay-test
+    proxies:
+      - 🚀 机场节点
+      - Vmess-ws
     type: relay
+  - name: fallback-auto
+    type: fallback
     proxies:
-      - ss-1
+      - relay-test
+      - Vmess-ws
+    url: 'http://www.gstatic.com/generate_204'
+    interval: 300
+  - name: udp-fallback-auto
+    type: fallback
+    proxies:
+      - JMS-1989@c83s1.jjcruises.com:0604
+      - JMS-1989@c83s2.jjcruises.com:0604
+    url: 'http://www.gstatic.com/generate_204'
+    interval: 300
   - name: 😈 节点选择
-    type: select
     proxies:
-      - ss-1
+      - relay-test
+      - Vmess-ws
+      - JMS-1989@c83s1.jjcruises.com:0604
+      - JMS-1989@c83s2.jjcruises.com:0604
+      - JMS-1989@c83s3.jjcruises.com:0604
+      - JMS-1989@c83s4.jjcruises.com:0604
+      - JMS-1989@c83s5.jjcruises.com:0604
+      - JMS-1989@c83s801.jjcruises.com:0604
+    type: select
   - name: 🚀 机场节点
-    type: select
     proxies:
-      - ss-1
-  - name: ♻️ 自动选择
+      - Vmess-ws
+      - JMS-1989@c83s1.jjcruises.com:0604
+      - JMS-1989@c83s2.jjcruises.com:0604
+      - JMS-1989@c83s3.jjcruises.com:0604
+      - JMS-1989@c83s4.jjcruises.com:0604
+      - JMS-1989@c83s5.jjcruises.com:0604
+      - JMS-1989@c83s801.jjcruises.com:0604
+    type: select
+  - interval: 300
+    name: ♻️ 自动选择
+    proxies:
+      - JMS-1989@c83s1.jjcruises.com:0604
+      - JMS-1989@c83s2.jjcruises.com:0604
+      - JMS-1989@c83s3.jjcruises.com:0604
+      - JMS-1989@c83s4.jjcruises.com:0604
+      - JMS-1989@c83s5.jjcruises.com:0604
+      - JMS-1989@c83s801.jjcruises.com:0604
     type: url-test
     url: http://www.gstatic.com/generate_204
-    interval: 300
-    proxies:
-      - ss-1
   - name: 🌍 国外媒体
-    type: select
     proxies:
-      - ss-1
+      - relay-test
+      - Vmess-ws
+      - JMS-1989@c83s1.jjcruises.com:0604
+      - JMS-1989@c83s2.jjcruises.com:0604
+      - JMS-1989@c83s3.jjcruises.com:0604
+      - JMS-1989@c83s4.jjcruises.com:0604
+      - JMS-1989@c83s5.jjcruises.com:0604
+      - JMS-1989@c83s801.jjcruises.com:0604
+    type: select
   - name: Ⓜ️ 微软服务
-    type: select
     proxies:
-      - ss-1
+      - 😈 节点选择
+      - 🎯 全球直连
+      - JMS-1989@c83s1.jjcruises.com:0604
+      - JMS-1989@c83s2.jjcruises.com:0604
+      - JMS-1989@c83s3.jjcruises.com:0604
+      - JMS-1989@c83s4.jjcruises.com:0604
+      - JMS-1989@c83s5.jjcruises.com:0604
+      - JMS-1989@c83s801.jjcruises.com:0604
+    type: select
   - name: 🍎 苹果服务
-    type: select
     proxies:
-      - ss-1
+      - 😈 节点选择
+      - 🎯 全球直连
+      - JMS-1989@c83s1.jjcruises.com:0604
+      - JMS-1989@c83s2.jjcruises.com:0604
+      - JMS-1989@c83s3.jjcruises.com:0604
+      - JMS-1989@c83s4.jjcruises.com:0604
+      - JMS-1989@c83s5.jjcruises.com:0604
+      - JMS-1989@c83s801.jjcruises.com:0604
+    type: select
   - name: 🔎谷歌服务
-    type: select
     proxies:
-      - ss-1
+      - 😈 节点选择
+      - JMS-1989@c83s1.jjcruises.com:0604
+      - JMS-1989@c83s2.jjcruises.com:0604
+      - JMS-1989@c83s3.jjcruises.com:0604
+      - JMS-1989@c83s4.jjcruises.com:0604
+      - JMS-1989@c83s5.jjcruises.com:0604
+      - JMS-1989@c83s801.jjcruises.com:0604
+    type: select
   - name: 🤖openai服务
-    type: select
     proxies:
-      - ss-1
+      - relay-test
+      - Vmess-ws
+      - JMS-1989@c83s1.jjcruises.com:0604
+      - JMS-1989@c83s2.jjcruises.com:0604
+      - JMS-1989@c83s3.jjcruises.com:0604
+      - JMS-1989@c83s4.jjcruises.com:0604
+      - JMS-1989@c83s5.jjcruises.com:0604
+      - JMS-1989@c83s801.jjcruises.com:0604
+    type: select
   - name: 📲 电报信息
-    type: select
     proxies:
-      - ss-1
+      - 😈 节点选择
+      - JMS-1989@c83s1.jjcruises.com:0604
+      - JMS-1989@c83s2.jjcruises.com:0604
+      - JMS-1989@c83s3.jjcruises.com:0604
+      - JMS-1989@c83s4.jjcruises.com:0604
+      - JMS-1989@c83s5.jjcruises.com:0604
+      - JMS-1989@c83s801.jjcruises.com:0604
+    type: select
   - name: 🎮 游戏
-    type: select
     proxies:
-      - ss-1
-  - name: 🎯 全球直连
+      - 😈 节点选择
+      - Vmess-ws
+      - JMS-1989@c83s1.jjcruises.com:0604
+      - JMS-1989@c83s2.jjcruises.com:0604
+      - JMS-1989@c83s3.jjcruises.com:0604
+      - JMS-1989@c83s4.jjcruises.com:0604
+      - JMS-1989@c83s5.jjcruises.com:0604
+      - JMS-1989@c83s801.jjcruises.com:0604
     type: select
+  - name: 🎯 全球直连
     proxies:
       - DIRECT
-  - name: 🛑 全球拦截
     type: select
+  - name: 🛑 全球拦截
     proxies:
       - REJECT
-  - name: 🐟 漏网之鱼
     type: select
+  - name: 🐟 漏网之鱼
     proxies:
-      - ss-1
+      - 😈 节点选择
+      - JMS-1989@c83s1.jjcruises.com:0604
+      - JMS-1989@c83s2.jjcruises.com:0604
+      - JMS-1989@c83s3.jjcruises.com:0604
+      - JMS-1989@c83s4.jjcruises.com:0604
+      - JMS-1989@c83s5.jjcruises.com:0604
+      - JMS-1989@c83s801.jjcruises.com:0604
+    type: select
 rule-providers:
-
   apple:
-    type: http
     behavior: classical
-    url: "https://raw.githubusercontent.com/blackmatrix7/ios_rule_script/master/rule/Clash/Apple/Apple_Classical_No_Resolve.yaml"
+    interval: 86400
     path: ./rule_provider/apple.yaml
-    interval: 86400
-
-  applications:
     type: http
+    url: https://rule-providers.leafsyang.com/apple
+  application:
     behavior: classical
-    url: "https://cdn.jsdelivr.net/gh/Loyalsoldier/clash-rules@release/applications.txt"
-    path: ./rule_provider/applications.yaml
     interval: 86400
-
+    path: ./rule_provider/application.yaml
+    type: http
+    url: https://rule-providers.leafsyang.com/application
   cncidr:
-    type: http
     behavior: ipcidr
-    url: "https://cdn.jsdelivr.net/gh/Loyalsoldier/clash-rules@release/cncidr.txt"
+    interval: 86400
     path: ./rule_provider/cncidr.yaml
-    interval: 86400
-
+    type: http
+    url: https://rule-providers.leafsyang.com/cncidr
   direct:
-    type: http
     behavior: domain
-    url: "https://cdn.jsdelivr.net/gh/Loyalsoldier/clash-rules@release/direct.txt"
+    interval: 86400
     path: ./rule_provider/direct.yaml
-    interval: 86400
-
+    type: http
+    url: https://rule-providers.leafsyang.com/direct
   globalmedia:
-    type: http
     behavior: classical
-    url: "https://raw.githubusercontent.com/blackmatrix7/ios_rule_script/master/rule/Clash/GlobalMedia/GlobalMedia_Classical_No_Resolve.yaml"
+    interval: 86400
     path: ./rule_provider/globalmedia.yaml
-    interval: 86400
-
+    type: http
+    url: https://rule-providers.leafsyang.com/globalmedia
   google:
-    type: http
     behavior: classical
-    url: "https://raw.githubusercontent.com/blackmatrix7/ios_rule_script/master/rule/Clash/Google/Google_No_Resolve.yaml"
+    interval: 86400
     path: ./rule_provider/google.yaml
-    interval: 86400
-
+    type: http
+    url: https://rule-providers.leafsyang.com/google
   lancidr:
-    type: http
     behavior: ipcidr
-    url: "https://cdn.jsdelivr.net/gh/Loyalsoldier/clash-rules@release/lancidr.txt"
+    interval: 86400
     path: ./rule_provider/lancidr.yaml
-    interval: 86400
-
+    type: http
+    url: https://rule-providers.leafsyang.com/lancidr
   microsoft:
-    type: http
     behavior: classical
-    url: "https://raw.githubusercontent.com/blackmatrix7/ios_rule_script/master/rule/Clash/Microsoft/Microsoft_No_Resolve.yaml"
+    interval: 86400
     path: ./rule_provider/microsoft.yaml
-    interval: 86400
-
+    type: http
+    url: https://rule-providers.leafsyang.com/microsoft
   openai:
-    type: http
     behavior: classical
-    url: "hhttps://raw.githubusercontent.com/blackmatrix7/ios_rule_script/master/rule/Clash/OpenAI/OpenAI_No_Resolve.yaml"
+    interval: 86400
     path: ./rule_provider/openai.yaml
-    interval: 86400
-
+    type: http
+    url: https://rule-providers.leafsyang.com/openai
   private:
-    type: http
     behavior: domain
-    url: "https://cdn.jsdelivr.net/gh/Loyalsoldier/clash-rules@release/private.txt"
+    interval: 86400
     path: ./rule_provider/private.yaml
-    interval: 86400
-
+    type: http
+    url: https://rule-providers.leafsyang.com/private
   proxy:
-    type: http
     behavior: domain
-    url: "https://cdn.jsdelivr.net/gh/Loyalsoldier/clash-rules@release/proxy.txt"
+    interval: 86400
     path: ./rule_provider/proxy.yaml
-    interval: 86400
-
+    type: http
+    url: https://rule-providers.leafsyang.com/proxy
   reject:
-    type: http
     behavior: domain
-    url: "https://cdn.jsdelivr.net/gh/Loyalsoldier/clash-rules@release/reject.txt"
+    interval: 86400
     path: ./rule_provider/reject.yaml
-    interval: 86400
-
+    type: http
+    url: https://rule-providers.leafsyang.com/reject
   telegram:
-    type: http
     behavior: classical
-    url: "https://raw.githubusercontent.com/blackmatrix7/ios_rule_script/master/rule/Clash/Telegram/Telegram_No_Resolve.yaml"
+    interval: 86400
     path: ./rule_provider/telegram.yaml
-    interval: 86400
-
-  youtube:
     type: http
+    url: https://rule-providers.leafsyang.com/telegram
+  youtube:
     behavior: classical
-    url: "https://raw.githubusercontent.com/blackmatrix7/ios_rule_script/master/rule/Clash/YouTube/YouTube_No_Resolve.yaml"
-    path: ./rule_provider/youtube.yaml
     interval: 86400
-
+    path: ./rule_provider/youtube.yaml
+    type: http
+    url: https://rule-providers.leafsyang.com/youtube
 rules:
+  - IP-CIDR,144.126.145.148/32,📲 电报信息,no-resolve
   - DOMAIN,clash.razord.top,🎯 全球直连
   - DOMAIN,yacd.haishan.me,🎯 全球直连
+  - DOMAIN-SUFFIX,leafsyang.com,🎯 全球直连
+  - DOMAIN-SUFFIX,leafsyang.xyz,fallback-auto
+  - DOMAIN-KEYWORD,3gppnetwork,udp-fallback-auto
+  - DOMAIN-KEYWORD,openairinfo,🚀 机场节点
+  - DOMAIN-KEYWORD,t-mobile,🚀 机场节点
+  - DOMAIN-KEYWORD,duolingo,🚀 机场节点
+  - DOMAIN-KEYWORD,ieltsonlinetests,🎯 全球直连
+  - DOMAIN-KEYWORD,bochk,🎯 全球直连
+  - DOMAIN-KEYWORD,binance,♻️ 自动选择
+  - DOMAIN-KEYWORD,kucoin,♻️ 自动选择
   - RULE-SET,reject,🛑 全球拦截,no-resolve
   - RULE-SET,apple,🍎 苹果服务,no-resolve
   - RULE-SET,youtube,🔎谷歌服务,no-resolve
@@ -192,7 +276,7 @@ rules:
   - RULE-SET,openai,🤖openai服务,no-resolve
   - RULE-SET,globalmedia,🌍 国外媒体,no-resolve
   - RULE-SET,telegram,📲 电报信息,no-resolve
-  - RULE-SET,applications,😈 节点选择,no-resolve
+  - RULE-SET,application,😈 节点选择,no-resolve
   - RULE-SET,proxy,😈 节点选择,no-resolve
   - RULE-SET,direct,🎯 全球直连,no-resolve
   - RULE-SET,lancidr,🎯 全球直连,no-resolve
