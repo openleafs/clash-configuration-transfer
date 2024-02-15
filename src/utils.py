@@ -45,7 +45,11 @@ def replace_name_for_proxy_group(clash_configuration: dict) -> dict:
             no_jms_proxies = filter(lambda x: x if "JMS" not in x else None, proxy_group["proxies"])
 
             new_jms_proxies = list(no_jms_proxies)
-            new_jms_proxies.extend(jms_names)
+
+            if proxy_group["name"] == "udp-fallback-auto":
+                new_jms_proxies.extend(jms_names[:2])
+            else:
+                new_jms_proxies.extend(jms_names)
             tmp_proxy_group["proxies"] = new_jms_proxies
 
             new_proxy_groups.append(tmp_proxy_group)
