@@ -1,52 +1,51 @@
 port: 7890
 socks-port: 7891
-external-controller: 127.0.0.1:9090
-log-level: info
+redir-port: 7892
+tproxy-port: 7895
+mixed-port: 7893
 mode: rule
+log-level: debug
+ipv6: false
+external-controller: 0.0.0.0:9090
 dns:
   enable: true
+  listen: 0.0.0.0:53
+  ipv6: false
   enhanced-mode: fake-ip
+  fake-ip-range: 198.18.0.1/16
   fake-ip-filter:
     - +.msftconnecttest.com
     - +.msftncsi.com
-  fake-ip-range: 198.18.0.1/16
-  ipv6: false
-  listen: 0.0.0.0:7874
+    - +.3gppnetwork.org
   nameserver:
     - 192.168.100.1
     - 192.168.0.1
     - 192.168.1.1
 proxies:
-  - cipher: aes-256-gcm
-    name: test
-    password: 1234
-    port: 1234
-    server: 1.1.1.1
+  - name: test
     type: ss
+    server: 1.1.1.1
+    port: 1234
+    cipher: chacha20-ietf-poly1305
+    password: 1234
     udp: true
 proxy-groups:
-  - name: relay-test
+  - name: proxy-chain
+    type: relay
     proxies:
       - 🚀 机场节点
       - Vmess-ws
-    type: relay
   - name: fallback-auto
     type: fallback
     proxies:
-      - relay-test
+      - proxy-chain
       - Vmess-ws
-    url: 'http://www.gstatic.com/generate_204'
-    interval: 300
-  - name: udp-fallback-auto
-    type: fallback
-    proxies:
-      - JMS-1989@c83s1.jjcruises.com:0604
-      - JMS-1989@c83s2.jjcruises.com:0604
     url: 'http://www.gstatic.com/generate_204'
     interval: 300
   - name: 😈 节点选择
+    type: select
     proxies:
-      - relay-test
+      - proxy-chain
       - Vmess-ws
       - JMS-1989@c83s1.jjcruises.com:0604
       - JMS-1989@c83s2.jjcruises.com:0604
@@ -54,8 +53,8 @@ proxy-groups:
       - JMS-1989@c83s4.jjcruises.com:0604
       - JMS-1989@c83s5.jjcruises.com:0604
       - JMS-1989@c83s801.jjcruises.com:0604
-    type: select
   - name: 🚀 机场节点
+    type: select
     proxies:
       - Vmess-ws
       - JMS-1989@c83s1.jjcruises.com:0604
@@ -64,21 +63,21 @@ proxy-groups:
       - JMS-1989@c83s4.jjcruises.com:0604
       - JMS-1989@c83s5.jjcruises.com:0604
       - JMS-1989@c83s801.jjcruises.com:0604
-    type: select
-  - interval: 300
-    name: ♻️ 自动选择
-    proxies:
-      - JMS-1989@c83s1.jjcruises.com:0604
-      - JMS-1989@c83s2.jjcruises.com:0604
-      - JMS-1989@c83s3.jjcruises.com:0604
-      - JMS-1989@c83s4.jjcruises.com:0604
-      - JMS-1989@c83s5.jjcruises.com:0604
-      - JMS-1989@c83s801.jjcruises.com:0604
+  - name: ♻️ 自动选择
     type: url-test
+    proxies:
+      - JMS-1989@c83s1.jjcruises.com:0604
+      - JMS-1989@c83s2.jjcruises.com:0604
+      - JMS-1989@c83s3.jjcruises.com:0604
+      - JMS-1989@c83s4.jjcruises.com:0604
+      - JMS-1989@c83s5.jjcruises.com:0604
+      - JMS-1989@c83s801.jjcruises.com:0604
     url: http://www.gstatic.com/generate_204
+    interval: 300
   - name: 🌍 国外媒体
+    type: select
     proxies:
-      - relay-test
+      - proxy-chain
       - Vmess-ws
       - JMS-1989@c83s1.jjcruises.com:0604
       - JMS-1989@c83s2.jjcruises.com:0604
@@ -86,8 +85,19 @@ proxy-groups:
       - JMS-1989@c83s4.jjcruises.com:0604
       - JMS-1989@c83s5.jjcruises.com:0604
       - JMS-1989@c83s801.jjcruises.com:0604
+  - name: 🛒 亚马逊服务
     type: select
+    proxies:
+      - 😈 节点选择
+      - 🎯 全球直连
+      - JMS-1989@c83s1.jjcruises.com:0604
+      - JMS-1989@c83s2.jjcruises.com:0604
+      - JMS-1989@c83s3.jjcruises.com:0604
+      - JMS-1989@c83s4.jjcruises.com:0604
+      - JMS-1989@c83s5.jjcruises.com:0604
+      - JMS-1989@c83s801.jjcruises.com:0604
   - name: Ⓜ️ 微软服务
+    type: select
     proxies:
       - 😈 节点选择
       - 🎯 全球直连
@@ -97,8 +107,8 @@ proxy-groups:
       - JMS-1989@c83s4.jjcruises.com:0604
       - JMS-1989@c83s5.jjcruises.com:0604
       - JMS-1989@c83s801.jjcruises.com:0604
-    type: select
   - name: 🍎 苹果服务
+    type: select
     proxies:
       - 😈 节点选择
       - 🎯 全球直连
@@ -108,8 +118,8 @@ proxy-groups:
       - JMS-1989@c83s4.jjcruises.com:0604
       - JMS-1989@c83s5.jjcruises.com:0604
       - JMS-1989@c83s801.jjcruises.com:0604
-    type: select
   - name: 🔎谷歌服务
+    type: select
     proxies:
       - 😈 节点选择
       - JMS-1989@c83s1.jjcruises.com:0604
@@ -118,10 +128,10 @@ proxy-groups:
       - JMS-1989@c83s4.jjcruises.com:0604
       - JMS-1989@c83s5.jjcruises.com:0604
       - JMS-1989@c83s801.jjcruises.com:0604
-    type: select
   - name: 🤖openai服务
+    type: select
     proxies:
-      - relay-test
+      - proxy-chain
       - Vmess-ws
       - JMS-1989@c83s1.jjcruises.com:0604
       - JMS-1989@c83s2.jjcruises.com:0604
@@ -129,8 +139,8 @@ proxy-groups:
       - JMS-1989@c83s4.jjcruises.com:0604
       - JMS-1989@c83s5.jjcruises.com:0604
       - JMS-1989@c83s801.jjcruises.com:0604
-    type: select
   - name: 📲 电报信息
+    type: select
     proxies:
       - 😈 节点选择
       - JMS-1989@c83s1.jjcruises.com:0604
@@ -139,8 +149,8 @@ proxy-groups:
       - JMS-1989@c83s4.jjcruises.com:0604
       - JMS-1989@c83s5.jjcruises.com:0604
       - JMS-1989@c83s801.jjcruises.com:0604
-    type: select
   - name: 🎮 游戏
+    type: select
     proxies:
       - 😈 节点选择
       - Vmess-ws
@@ -150,16 +160,16 @@ proxy-groups:
       - JMS-1989@c83s4.jjcruises.com:0604
       - JMS-1989@c83s5.jjcruises.com:0604
       - JMS-1989@c83s801.jjcruises.com:0604
-    type: select
   - name: 🎯 全球直连
+    type: select
     proxies:
       - DIRECT
-    type: select
   - name: 🛑 全球拦截
+    type: select
     proxies:
       - REJECT
-    type: select
   - name: 🐟 漏网之鱼
+    type: select
     proxies:
       - 😈 节点选择
       - JMS-1989@c83s1.jjcruises.com:0604
@@ -168,7 +178,6 @@ proxy-groups:
       - JMS-1989@c83s4.jjcruises.com:0604
       - JMS-1989@c83s5.jjcruises.com:0604
       - JMS-1989@c83s801.jjcruises.com:0604
-    type: select
 rule-providers:
   apple:
     behavior: classical
@@ -182,6 +191,12 @@ rule-providers:
     path: ./rule_provider/application.yaml
     type: http
     url: https://rule-providers.leafsyang.com/application
+  aws:
+    behavior: classical
+    interval: 86400
+    path: ./rule_provider/aws.yaml
+    type: http
+    url: https://rule-providers.leafsyang.com/aws
   cncidr:
     behavior: ipcidr
     interval: 86400
@@ -260,7 +275,7 @@ rules:
   - DOMAIN,yacd.haishan.me,🎯 全球直连
   - DOMAIN-SUFFIX,leafsyang.com,🎯 全球直连
   - DOMAIN-SUFFIX,leafsyang.xyz,fallback-auto
-  - DOMAIN-KEYWORD,3gppnetwork,udp-fallback-auto
+  - DOMAIN-KEYWORD,3gppnetwork,🚀 机场节点
   - DOMAIN-KEYWORD,openairinfo,🚀 机场节点
   - DOMAIN-KEYWORD,t-mobile,🚀 机场节点
   - DOMAIN-KEYWORD,duolingo,🚀 机场节点
@@ -268,7 +283,7 @@ rules:
   - DOMAIN-KEYWORD,bochk,🎯 全球直连
   - DOMAIN-KEYWORD,binance,♻️ 自动选择
   - DOMAIN-KEYWORD,kucoin,♻️ 自动选择
-  - RULE-SET,reject,🛑 全球拦截,no-resolve
+  - RULE-SET,aws,🛒 亚马逊服务,no-resolve
   - RULE-SET,apple,🍎 苹果服务,no-resolve
   - RULE-SET,youtube,🔎谷歌服务,no-resolve
   - RULE-SET,google,🔎谷歌服务,no-resolve
@@ -277,6 +292,7 @@ rules:
   - RULE-SET,globalmedia,🌍 国外媒体,no-resolve
   - RULE-SET,telegram,📲 电报信息,no-resolve
   - RULE-SET,application,😈 节点选择,no-resolve
+  - RULE-SET,reject,🛑 全球拦截,no-resolve
   - RULE-SET,proxy,😈 节点选择,no-resolve
   - RULE-SET,direct,🎯 全球直连,no-resolve
   - RULE-SET,lancidr,🎯 全球直连,no-resolve
