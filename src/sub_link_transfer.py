@@ -16,24 +16,24 @@ class SubLinkTransfer:
         proxy_protocol, proxy_content = proxy_link.split("://")
 
         if proxy_protocol == "ss":
-            proxy_configuration_base64, domain = proxy_content.split("#")
+            proxy_configuration_base64, proxy_name = proxy_content.split("#")
         else:
             proxy_configuration_base64 = proxy_content
-            domain = ""
+            proxy_name = ""
 
         proxy_configuration = decode_base64_str(proxy_configuration_base64)
 
-        return proxy_protocol, proxy_configuration, domain
+        return proxy_protocol, proxy_configuration, proxy_name
 
     @staticmethod
-    def transfer(proxy_protocol: str, proxy_configuration: str, domain: str) -> dict:
+    def transfer(proxy_protocol: str, proxy_configuration: str, proxy_name: str) -> dict:
 
         if proxy_protocol == "ss":
             components = proxy_configuration.split("@")
             cipher, password = components[0].split(":")
             address, port = components[1].split(":")
             return dict(
-                name=domain,
+                name=proxy_name,
                 type="ss",
                 server=address,
                 port=int(port),
@@ -56,13 +56,13 @@ class SubLinkTransfer:
             components["skip-cert-verify"] = False
             components["network"] = tmp_dict["net"] if "net" in tmp_dict else "tcp"
 
-            if "host" in tmp_dict and tmp_dict["host"] != "":
-                components["servername"] = tmp_dict["host"]
+            if "sni" in tmp_dict and tmp_dict["sni"] != "":
+                components["servername"] = tmp_dict["sni"]
 
             if components["network"] == "ws":
                 components["ws-opts"] = dict(path=tmp_dict["path"])
-                if "sni" in tmp_dict and tmp_dict["sni"] != "":
-                    components["ws-opts"]["headers"] = dict(Host=tmp_dict["sni"])
+                if "host" in tmp_dict and tmp_dict["host"] != "":
+                    components["ws-opts"]["headers"] = dict(Host=tmp_dict["host"])
 
             return components
         else:
@@ -73,8 +73,8 @@ class SubLinkTransfer:
         proxies = []
 
         for proxy_link in proxy_links:
-            proxy_protocol, proxy_configuration, domain = self.decode_base64_for_proxy_link(proxy_link)
-            components = self.transfer(proxy_protocol, proxy_configuration, domain)
+            proxy_protocol, proxy_configuration, proxy_name = self.decode_base64_for_proxy_link(proxy_link)
+            components = self.transfer(proxy_protocol, proxy_configuration, proxy_name)
             proxies.append(components)
 
         return proxies
